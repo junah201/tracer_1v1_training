@@ -2491,3 +2491,20 @@ rule "Bot Tracer Ultimate":
     if RULE_CONDITION:
         goto RULE_START
 
+
+
+rule "Bot Tracer Crouch Movement":
+    @Event eachPlayer
+    @Hero tracer
+    @Condition eventPlayer.isDummy() == true
+    @Condition eventPlayer.isAlive() == true
+    @Condition Arena1Q[eventPlayer.TargetNumber].isAlive() == true
+    @Condition Arena1Match == true
+    @Condition eventPlayer.BotShoot == true
+
+    eventPlayer.startForcingButton(Button.CROUCH)
+    wait(random.uniform(0.1, 0.5))
+    eventPlayer.stopForcingButton(Button.CROUCH)
+    wait(random.uniform(1, 5))
+    if RULE_CONDITION:
+        goto RULE_START
