@@ -1761,13 +1761,15 @@ rule "Bot Melee":
     @Condition Arena1Match == true
     @Condition distance(eventPlayer.getEyePosition(), Arena1Q[eventPlayer.TargetNumber].getEyePosition()) <= 3
     @Condition eventPlayer.BotShoot == true
-    @Condition Arena1Q[eventPlayer.TargetNumber].getHealth() <= 40
+    @Condition Arena1Q[eventPlayer.TargetNumber].getHealth() <= 100
 
     if dotProduct(directionTowards(eventPlayer.getEyePosition(), Arena1Q[eventPlayer.TargetNumber].getEyePosition()), eventPlayer.getFacingDirection()) < -0.6:
+        wait(random.uniform(0.1, 0.3))
+
     eventPlayer.startFacing(directionTowards(eventPlayer.getEyePosition(), Arena1Q[eventPlayer.TargetNumber].getEyePosition()), 720, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
     eventPlayer.setDamageDealt(100)
     eventPlayer.forceButtonPress(Button.MELEE)
-    wait(2)
+    wait(1)
     if RULE_CONDITION:
         goto RULE_START
 
