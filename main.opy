@@ -178,7 +178,6 @@ playervar BotLeft 34
 playervar BotRight 35
 playervar ShootRando 36
 playervar ShootPos 37
-playervar ZenAim 38
 playervar ShootPosHelp 39
 playervar BotStayTimer 40
 playervar BotSoldRun 41
@@ -197,7 +196,6 @@ playervar BotKiriHeal 51
 #Subroutine names
 
 subroutine SpawnLocationCheck 0
-subroutine ZenAim 5
 subroutine BotHeroList 6
 
 
@@ -1765,7 +1763,7 @@ rule "Bot Melee":
     @Condition eventPlayer.BotShoot == true
     @Condition Arena1Q[eventPlayer.TargetNumber].getHealth() <= 40
 
-    wait(abs(eventPlayer.BotDifficulty - 6) - 10, Wait.ABORT_WHEN_FALSE)
+    if dotProduct(directionTowards(eventPlayer.getEyePosition(), Arena1Q[eventPlayer.TargetNumber].getEyePosition()), eventPlayer.getFacingDirection()) < -0.6:
     eventPlayer.startFacing(directionTowards(eventPlayer.getEyePosition(), Arena1Q[eventPlayer.TargetNumber].getEyePosition()), 720, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
     eventPlayer.setDamageDealt(100)
     eventPlayer.forceButtonPress(Button.MELEE)
@@ -2401,10 +2399,7 @@ rule "Bot Tracer Primary":
     @Condition distance(eventPlayer.getEyePosition(), Arena1Q[eventPlayer.TargetNumber].getEyePosition()) <= 15
 
     wait(0.2, Wait.ABORT_WHEN_FALSE)
-    if Arena1Q[eventPlayer.TargetNumber].getCurrentHero() == Hero.GENJI and Arena1Q[eventPlayer.TargetNumber].isUsingAbility2() == true:
-        goto lbl_0
     eventPlayer.startForcingButton(Button.PRIMARY_FIRE)
-    lbl_0:
     eventPlayer.startFacing(directionTowards(eventPlayer.getEyePosition(), eventPlayer.ShootPos), 500 / (distance(eventPlayer.getEyePosition(), Arena1Q[eventPlayer.TargetNumber].getEyePosition()) / 5), Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
 
 
@@ -2417,7 +2412,7 @@ rule "Bot Tracer Primary Tracking":
     @Condition Arena1Match == true
 
     eventPlayer.ShootRando = random.uniform(1, abs(eventPlayer.BotDifficulty - 6))
-    #eventPlayer.ShootRando = random.randint(1, 3)
+        wait(0.08 + ((5 - eventPlayer.BotDifficulty) / 50), Wait.ABORT_WHEN_FALSE)
     eventPlayer.ShootPosHelp = eventPlayer.ShootRando / 10 * Arena1Q[eventPlayer.TargetNumber].getVelocity() + Arena1Q[eventPlayer.TargetNumber].getEyePosition()
     eventPlayer.ShootPos = vect(eventPlayer.ShootPosHelp.x, Arena1Q[eventPlayer.TargetNumber].getEyePosition().y - 0.4, eventPlayer.ShootPosHelp.z)
     wait(eventPlayer.ShootRando / 10 - 0, Wait.ABORT_WHEN_FALSE)
@@ -2448,27 +2443,6 @@ rule "Bot Tracer Stop Primary":
     eventPlayer.startFacing(directionTowards(eventPlayer.getEyePosition(), Arena1Q[eventPlayer.TargetNumber].getEyePosition()), 360, Relativity.TO_WORLD, FacingReeval.DIRECTION_AND_TURN_RATE)
     if RULE_CONDITION:
         goto RULE_START
-
-
-rule "Bot Tracer Stop Primary vs Reflect":
-    @Event eachPlayer
-    @Hero tracer
-    @Condition eventPlayer.isDummy() == true
-    @Condition eventPlayer.isAlive() == true
-    @Condition Arena1Q[eventPlayer.TargetNumber].isAlive() == true
-    @Condition Arena1Match == true
-    @Condition Arena1Q[eventPlayer.TargetNumber].getCurrentHero() == Hero.GENJI
-    @Condition Arena1Q[eventPlayer.TargetNumber].isUsingAbility2() == true
-    @Condition eventPlayer.isUsingUltimate() == false
-
-    wait(random.uniform(0, 0.3), Wait.ABORT_WHEN_FALSE)
-    eventPlayer.forceButtonPress(Button.RELOAD)
-    eventPlayer.stopForcingButton(Button.PRIMARY_FIRE)
-    waitUntil(Arena1Q[eventPlayer.TargetNumber].isUsingAbility2() == false, 2)
-    if eventPlayer.getCurrentHero() == Hero.TRACER:
-        if eventPlayer.BotShoot == true:
-            eventPlayer.startForcingButton(Button.PRIMARY_FIRE)
-
 
 rule "Bot Tracer Ultimate":
     @Event eachPlayer
