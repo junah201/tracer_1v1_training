@@ -2413,8 +2413,10 @@ rule "Bot Tracer Primary Tracking":
     @Condition Arena1Q[eventPlayer.TargetNumber].isAlive() == true
     @Condition Arena1Match == true
 
-    eventPlayer.ShootRando = random.uniform(1, abs(eventPlayer.BotDifficulty - 6))
+    if dotProduct(directionTowards(eventPlayer.getEyePosition(), Arena1Q[eventPlayer.TargetNumber].getEyePosition()), eventPlayer.getFacingDirection()) < -0.6:
         wait(0.08 + ((5 - eventPlayer.BotDifficulty) / 50), Wait.ABORT_WHEN_FALSE)
+
+    eventPlayer.ShootRando = random.uniform(1, abs(eventPlayer.BotDifficulty - 6)) / 2
     eventPlayer.ShootPosHelp = eventPlayer.ShootRando / 10 * Arena1Q[eventPlayer.TargetNumber].getVelocity() + Arena1Q[eventPlayer.TargetNumber].getEyePosition()
     eventPlayer.ShootPos = vect(eventPlayer.ShootPosHelp.x, Arena1Q[eventPlayer.TargetNumber].getEyePosition().y - 0.4, eventPlayer.ShootPosHelp.z)
     wait(eventPlayer.ShootRando / 10 - 0, Wait.ABORT_WHEN_FALSE)
